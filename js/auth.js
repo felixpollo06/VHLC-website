@@ -84,8 +84,11 @@ function redirectIfLoggedIn() {
 
 // ── Get Root Path (works from subdirectories) ───────────────
 function getRootPath() {
-  const depth = window.location.pathname.split('/').length - 2;
-  return depth > 0 ? '../'.repeat(depth) : './';
+  const path = window.location.pathname;
+  if (path.includes('/admin/') || path.includes('/student/') || path.includes('/teacher/')) {
+    return '../';
+  }
+  return './';
 }
 
 // ── Get Current Auth User ────────────────────────────────────
