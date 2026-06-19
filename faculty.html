@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty Directory | Victoria Homes Learning Center</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg vhlc-navbar">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <div class="brand-logo">V</div>
+        <div class="brand-text">
+          Victoria Homes Learning Center
+          <small>Excellence in Education</small>
+        </div>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <i class="bi bi-list text-white fs-4"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto align-items-center gap-1">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+          <li class="nav-item"><a class="nav-link active" href="faculty.html">Faculty</a></li>
+          <li class="nav-item"><a class="nav-link" href="announcements.html">Announcements</a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+          <li class="nav-item"><a class="nav-link btn-nav-login ms-2" href="login.html">Login</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-hero text-center text-white">
+    <div class="container">
+      <h1 class="page-hero-title">Faculty Directory</h1>
+      <p class="page-hero-sub">Meet our dedicated team of educators.</p>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb breadcrumb-vhlc justify-content-center mt-3">
+          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Faculty</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <section class="py-5">
+    <div class="container">
+      <div class="row justify-content-center mb-4">
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+            <input type="text" class="vhlc-form-control border-start-0 ps-0" id="searchInput" placeholder="Search faculty by name...">
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4" id="faculty-container">
+        <!-- Skeleton Loading -->
+        <div class="col-md-4 col-sm-6"><div class="faculty-card p-4"><div class="spinner-border text-primary" role="status"></div></div></div>
+        <div class="col-md-4 col-sm-6"><div class="faculty-card p-4"><div class="spinner-border text-primary" role="status"></div></div></div>
+        <div class="col-md-4 col-sm-6"><div class="faculty-card p-4"><div class="spinner-border text-primary" role="status"></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="vhlc-footer">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="footer-brand">
+            <div class="footer-logo">V</div>
+            <div>
+              <div class="footer-brand-name">Victoria Homes Learning Center</div>
+              <div class="footer-brand-tagline">Excellence in Education</div>
+            </div>
+          </div>
+          <p style="font-size:.85rem;color:rgba(255,255,255,.55);max-width:300px">
+            Nurturing young minds and building a foundation for lifelong learning in Victoria Homes.
+          </p>
+        </div>
+        <div class="col-lg-2 col-6">
+          <div class="footer-heading">Quick Links</div>
+          <a class="footer-link" href="index.html">Home</a>
+          <a class="footer-link" href="about.html">About Us</a>
+          <a class="footer-link" href="faculty.html">Faculty</a>
+          <a class="footer-link" href="announcements.html">Announcements</a>
+        </div>
+        <div class="col-lg-3 col-6">
+          <div class="footer-heading">Portals</div>
+          <a class="footer-link" href="login.html">Student Portal</a>
+          <a class="footer-link" href="login.html">Teacher Portal</a>
+          <a class="footer-link" href="login.html">Admin Portal</a>
+        </div>
+        <div class="col-lg-3">
+          <div class="footer-heading">Contact</div>
+          <p style="font-size:.85rem;color:rgba(255,255,255,.55)">
+            <i class="bi bi-geo-alt-fill me-2"></i>Victoria Homes, Philippines<br>
+            <i class="bi bi-telephone-fill me-2"></i>(+63) XXX-XXX-XXXX<br>
+            <i class="bi bi-envelope-fill me-2"></i>info@vhlc.edu.ph
+          </p>
+        </div>
+      </div>
+      <hr class="footer-divider">
+      <div class="footer-bottom">
+        <span>© 2026 Victoria Homes Learning Center. All rights reserved.</span>
+        <span>Powered by Firebase & GitHub Pages</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const container = document.getElementById('faculty-container');
+      const searchInput = document.getElementById('searchInput');
+      let allFaculty = [];
+
+      try {
+        const snapshot = await db.collection('teachers').get();
+        if (snapshot.empty) {
+          container.innerHTML = `<div class="col-12">${emptyState('👩‍🏫', 'No faculty listed yet')}</div>`;
+          return;
+        }
+
+        allFaculty = snapshot.docs.map(doc => doc.data());
+        renderFaculty(allFaculty);
+
+        searchInput.addEventListener('input', (e) => {
+          const term = e.target.value.toLowerCase();
+          const filtered = allFaculty.filter(t => t.fullName.toLowerCase().includes(term));
+          renderFaculty(filtered);
+        });
+
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = `<div class="col-12 text-center text-danger">Failed to load faculty directory.</div>`;
+      }
+
+      function renderFaculty(teachers) {
+        container.innerHTML = '';
+        if (teachers.length === 0) {
+          container.innerHTML = `<div class="col-12 text-center text-muted py-4">No matching faculty found.</div>`;
+          return;
+        }
+
+        teachers.forEach(t => {
+          const subjects = t.subjects ? t.subjects.join(', ') : 'Assigned Subjects';
+          container.innerHTML += `
+            <div class="col-md-4 col-sm-6 animate-fade-up">
+              <div class="faculty-card pb-4">
+                <div class="faculty-avatar">${getInitials(t.fullName)}</div>
+                <div class="faculty-name">${escapeHTML(t.fullName)}</div>
+                <div class="faculty-subject">${escapeHTML(subjects)}</div>
+                <div class="faculty-role mt-2"><span class="badge-role badge-teacher">Teacher</span></div>
+              </div>
+            </div>
+          `;
+        });
+      }
+    });
+  </script>
+</body>
+</html>

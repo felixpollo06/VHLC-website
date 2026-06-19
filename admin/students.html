@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Students | VHLC Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+  <!-- Portal Navbar -->
+  <nav class="navbar navbar-expand-lg vhlc-navbar">
+    <div class="container-fluid px-3">
+      <button id="sidebar-toggle" class="btn p-1 me-2 d-lg-none" style="color:#fff">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+      <a class="navbar-brand" href="#">
+        <div class="brand-logo">V</div>
+        <div class="brand-text">
+          VHLC Admin
+          <small>Victoria Homes Learning Center</small>
+        </div>
+      </a>
+      <div class="ms-auto d-flex align-items-center gap-3">
+        <span id="nav-user-name" style="color:rgba(255,255,255,.8);font-size:.85rem;font-weight:500">Admin</span>
+        <button onclick="logoutUser()" class="btn btn-sm" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:50px;padding:.35rem 1rem;font-size:.83rem">
+          <i class="bi bi-box-arrow-right me-1"></i> Logout
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="portal-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="portal-sidebar">
+      <div class="sidebar-header">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <div style="width:38px;height:38px;background:#EDE9FE;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;color:#7C3AED" id="sidebar-avatar">A</div>
+          <div>
+            <div class="sidebar-user-name" id="sidebar-user-name">Administrator</div>
+            <div class="sidebar-user-role" style="color:#A78BFA">Admin Access</div>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Overview</div>
+        <a href="dashboard.html" class="sidebar-nav-item"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+        <div class="sidebar-section-label">Management</div>
+        <a href="students.html" class="sidebar-nav-item active"><i class="bi bi-mortarboard-fill"></i> Manage Students</a>
+        <a href="teachers.html" class="sidebar-nav-item"><i class="bi bi-person-video3"></i> Manage Teachers</a>
+        <a href="subjects.html" class="sidebar-nav-item"><i class="bi bi-journal-text"></i> Subjects & Sections</a>
+        <a href="announcements.html" class="sidebar-nav-item"><i class="bi bi-megaphone-fill"></i> Announcements</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button onclick="logoutUser()" class="sidebar-nav-item w-100" style="border:none;background:none;text-align:left;color:rgba(255,255,255,.6)">
+          <i class="bi bi-box-arrow-right"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <main class="portal-content">
+      <div class="portal-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <h1 class="portal-title">Manage Students</h1>
+          <p class="portal-subtitle">Add, edit, or disable student accounts.</p>
+        </div>
+        <button class="btn-primary-vhlc" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+          <i class="bi bi-plus-lg me-1"></i> Add Student
+        </button>
+      </div>
+
+      <div class="vhlc-card p-0 overflow-hidden">
+        <div class="p-3 border-bottom bg-light d-flex gap-3 flex-wrap">
+          <input type="text" id="search-input" class="vhlc-form-control" placeholder="Search by name or LRN..." style="max-width:300px">
+          <select id="filter-grade" class="vhlc-form-control" style="max-width:200px">
+            <option value="">All Grades</option>
+            <option value="1">Grade 1</option>
+            <option value="2">Grade 2</option>
+            <option value="3">Grade 3</option>
+            <option value="4">Grade 4</option>
+            <option value="5">Grade 5</option>
+            <option value="6">Grade 6</option>
+          </select>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="vhlc-table">
+            <thead>
+              <tr>
+                <th>LRN</th>
+                <th>Full Name</th>
+                <th>Grade</th>
+                <th>Section</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="students-tbody">
+              <tr><td colspan="6" class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Student Modal -->
+  <div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content border-0 shadow-lg" style="border-radius: var(--radius)">
+        <div class="vhlc-modal-header">
+          <h5 class="modal-title m-0">Add New Student</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="addStudentForm">
+          <div class="modal-body p-4">
+            <h6 class="fw-bold mb-3 text-primary border-bottom pb-2">Account Details</h6>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6 form-group">
+                <label class="vhlc-label">Email Address</label>
+                <input type="email" id="stu-email" class="vhlc-form-control" required>
+              </div>
+              <div class="col-md-6 form-group">
+                <label class="vhlc-label">Password</label>
+                <input type="password" id="stu-pass" class="vhlc-form-control" required minlength="6">
+              </div>
+            </div>
+
+            <h6 class="fw-bold mb-3 text-primary border-bottom pb-2">Student Information</h6>
+            <div class="row g-3">
+              <div class="col-md-6 form-group">
+                <label class="vhlc-label">Full Name</label>
+                <input type="text" id="stu-name" class="vhlc-form-control" required>
+              </div>
+              <div class="col-md-6 form-group">
+                <label class="vhlc-label">LRN</label>
+                <input type="text" id="stu-lrn" class="vhlc-form-control" required>
+              </div>
+              <div class="col-md-4 form-group">
+                <label class="vhlc-label">Grade Level</label>
+                <select id="stu-grade" class="vhlc-form-control" required>
+                  <option value="" disabled selected>Select</option>
+                  <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                  <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+                </select>
+              </div>
+              <div class="col-md-4 form-group">
+                <label class="vhlc-label">Section</label>
+                <select id="stu-sec" class="vhlc-form-control" required disabled>
+                  <option value="" disabled selected>Select</option>
+                </select>
+              </div>
+              <div class="col-md-4 form-group">
+                <label class="vhlc-label">School Year</label>
+                <input type="text" id="stu-sy" class="vhlc-form-control" required>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-0 p-4 pt-0">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn-primary-vhlc" id="btn-save-stu">Create Student</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/auth.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      initSidebarToggle();
+      let allStudents = [];
+      let allUsers = {};
+      let sectionsMap = {}; // grade -> [sections]
+
+      try {
+        await requireAuth('admin');
+        
+        // Auto-fill school year
+        document.getElementById('stu-sy').value = currentSchoolYear();
+
+        // Load sections for dropdowns
+        const secSnap = await db.collection('sections').get();
+        secSnap.forEach(d => {
+          const data = d.data();
+          if(!sectionsMap[data.gradeLevel]) sectionsMap[data.gradeLevel] = [];
+          sectionsMap[data.gradeLevel].push(data.name);
+        });
+
+        document.getElementById('stu-grade').addEventListener('change', (e) => {
+          const selSec = document.getElementById('stu-sec');
+          const lvl = e.target.value;
+          selSec.disabled = false;
+          populateSelect(selSec, sectionsMap[lvl] || [], 'Select Section');
+        });
+
+        loadStudents();
+
+      } catch (err) {
+        console.error(err);
+      }
+
+      async function loadStudents() {
+        const tbody = document.getElementById('students-tbody');
+        try {
+          // Fetch users (to get isActive status)
+          const userSnap = await db.collection('users').where('role', '==', 'student').get();
+          userSnap.forEach(u => allUsers[u.id] = u.data());
+
+          // Fetch students profiles
+          const stuSnap = await db.collection('students').orderBy('fullName').get();
+          allStudents = stuSnap.docs.map(d => d.data());
+
+          renderTable(allStudents);
+        } catch (err) {
+          console.error(err);
+          tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Failed to load students.</td></tr>`;
+        }
+      }
+
+      function renderTable(students) {
+        const tbody = document.getElementById('students-tbody');
+        if (students.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6">${emptyState('👨‍🎓', 'No students found')}</td></tr>`;
+          return;
+        }
+
+        let html = '';
+        students.forEach(s => {
+          const u = allUsers[s.uid] || {};
+          const isActive = u.isActive !== false;
+          const statusBadge = isActive 
+            ? '<span class="badge-present">Active</span>' 
+            : '<span class="badge-absent">Disabled</span>';
+            
+          const actionBtn = isActive
+            ? `<button class="btn btn-sm btn-outline-danger w-100" onclick="toggleStatus('${s.uid}', false)">Disable</button>`
+            : `<button class="btn btn-sm btn-outline-success w-100" onclick="toggleStatus('${s.uid}', true)">Enable</button>`;
+
+          html += `
+            <tr>
+              <td class="text-muted fs-sm">${escapeHTML(s.lrn || '-')}</td>
+              <td class="fw-bold">${escapeHTML(s.fullName)}</td>
+              <td>${s.gradeLevel}</td>
+              <td>${escapeHTML(s.section)}</td>
+              <td>${statusBadge}</td>
+              <td style="width:120px">${actionBtn}</td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      }
+
+      // Search & Filter
+      const searchInput = document.getElementById('search-input');
+      const filterGrade = document.getElementById('filter-grade');
+
+      function applyFilters() {
+        const term = searchInput.value.toLowerCase();
+        const grade = filterGrade.value;
+
+        const filtered = allStudents.filter(s => {
+          const matchText = s.fullName.toLowerCase().includes(term) || (s.lrn && s.lrn.includes(term));
+          const matchGrade = grade ? s.gradeLevel == grade : true;
+          return matchText && matchGrade;
+        });
+        renderTable(filtered);
+      }
+
+      searchInput.addEventListener('input', applyFilters);
+      filterGrade.addEventListener('change', applyFilters);
+
+      // Add Student
+      document.getElementById('addStudentForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-save-stu');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="spinner-border spinner-border-sm"></i> Creating...';
+
+        const profileData = {
+          role: 'student',
+          fullName: document.getElementById('stu-name').value,
+          lrn: document.getElementById('stu-lrn').value,
+          gradeLevel: parseInt(document.getElementById('stu-grade').value),
+          section: document.getElementById('stu-sec').value,
+          schoolYear: document.getElementById('stu-sy').value
+        };
+
+        const email = document.getElementById('stu-email').value;
+        const pass = document.getElementById('stu-pass').value;
+
+        try {
+          await adminCreateUser(email, pass, profileData);
+          showToast('Student created successfully!', 'success');
+          
+          const modal = bootstrap.Modal.getInstance(document.getElementById('addStudentModal'));
+          modal.hide();
+          e.target.reset();
+          document.getElementById('stu-sy').value = currentSchoolYear();
+          document.getElementById('stu-sec').disabled = true;
+          
+          loadStudents(); // reload table
+        } catch (err) {
+          console.error(err);
+          showToast(err.message, 'error');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = 'Create Student';
+        }
+      });
+
+      // Toggle Status
+      window.toggleStatus = async (uid, isActive) => {
+        const action = isActive ? 'enable' : 'disable';
+        if (!confirmAction(`Are you sure you want to ${action} this account?`)) return;
+        
+        try {
+          await setUserStatus(uid, isActive);
+          showToast(`Account ${isActive ? 'enabled' : 'disabled'}`, 'success');
+          loadStudents();
+        } catch (err) {
+          console.error(err);
+          showToast('Failed to update status', 'error');
+        }
+      };
+
+    });
+  </script>
+</body>
+</html>

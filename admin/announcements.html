@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Announcements | VHLC Admin Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+  <!-- Portal Navbar -->
+  <nav class="navbar navbar-expand-lg vhlc-navbar">
+    <div class="container-fluid px-3">
+      <button id="sidebar-toggle" class="btn p-1 me-2 d-lg-none" style="color:#fff">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+      <a class="navbar-brand" href="#">
+        <div class="brand-logo">V</div>
+        <div class="brand-text">
+          VHLC Admin
+          <small>Victoria Homes Learning Center</small>
+        </div>
+      </a>
+      <div class="ms-auto d-flex align-items-center gap-3">
+        <span id="nav-user-name" style="color:rgba(255,255,255,.8);font-size:.85rem;font-weight:500">Admin</span>
+        <button onclick="logoutUser()" class="btn btn-sm" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:50px;padding:.35rem 1rem;font-size:.83rem">
+          <i class="bi bi-box-arrow-right me-1"></i> Logout
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="portal-layout">
+    <aside class="sidebar" id="portal-sidebar">
+      <div class="sidebar-header">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <div style="width:38px;height:38px;background:#EDE9FE;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;color:#7C3AED" id="sidebar-avatar">A</div>
+          <div>
+            <div class="sidebar-user-name" id="sidebar-user-name">Administrator</div>
+            <div class="sidebar-user-role" style="color:#A78BFA">Admin Access</div>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Overview</div>
+        <a href="dashboard.html" class="sidebar-nav-item"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+        <div class="sidebar-section-label">Management</div>
+        <a href="students.html" class="sidebar-nav-item"><i class="bi bi-mortarboard-fill"></i> Manage Students</a>
+        <a href="teachers.html" class="sidebar-nav-item"><i class="bi bi-person-video3"></i> Manage Teachers</a>
+        <a href="subjects.html" class="sidebar-nav-item"><i class="bi bi-journal-text"></i> Subjects & Sections</a>
+        <a href="announcements.html" class="sidebar-nav-item active"><i class="bi bi-megaphone-fill"></i> Announcements</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button onclick="logoutUser()" class="sidebar-nav-item w-100" style="border:none;background:none;text-align:left;color:rgba(255,255,255,.6)">
+          <i class="bi bi-box-arrow-right"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <main class="portal-content">
+      <div class="portal-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <h1 class="portal-title">Announcements</h1>
+          <p class="portal-subtitle">Broadcast news and updates to specific audiences.</p>
+        </div>
+        <button class="btn-primary-vhlc" data-bs-toggle="modal" data-bs-target="#announcementModal" onclick="prepareModal('add')">
+          <i class="bi bi-plus-lg me-1"></i> Post Announcement
+        </button>
+      </div>
+
+      <div class="vhlc-card p-0 overflow-hidden">
+        <div class="table-responsive">
+          <table class="vhlc-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th width="15%">Audience</th>
+                <th width="20%">Date Posted</th>
+                <th width="15%">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ann-tbody">
+              <tr><td colspan="4" class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Announcement Modal -->
+  <div class="modal fade" id="announcementModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content border-0 shadow-lg" style="border-radius: var(--radius)">
+        <div class="vhlc-modal-header">
+          <h5 class="modal-title m-0" id="modal-title">Post Announcement</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="annForm">
+          <input type="hidden" id="ann-id">
+          <div class="modal-body p-4">
+            <div class="row g-3">
+              <div class="col-12 form-group">
+                <label class="vhlc-label">Title</label>
+                <input type="text" id="ann-title" class="vhlc-form-control" required placeholder="Announcement Title">
+              </div>
+              <div class="col-md-6 form-group">
+                <label class="vhlc-label">Audience</label>
+                <select id="ann-audience" class="vhlc-form-control" required>
+                  <option value="all">All (Public + Portals)</option>
+                  <option value="public">Public Website Only</option>
+                  <option value="students">Students Only</option>
+                  <option value="teachers">Teachers Only</option>
+                </select>
+              </div>
+              <div class="col-12 form-group">
+                <label class="vhlc-label">Body Text</label>
+                <textarea id="ann-body" class="vhlc-form-control" rows="6" required placeholder="Write your message here..."></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-0 p-4 pt-0">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn-primary-vhlc" id="btn-save-ann">Post Announcement</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      initSidebarToggle();
+      let allAnnouncements = [];
+      let currentUser;
+
+      try {
+        const { user } = await requireAuth('admin');
+        currentUser = user;
+        loadAnnouncements();
+      } catch (err) {
+        console.error(err);
+      }
+
+      async function loadAnnouncements() {
+        const tbody = document.getElementById('ann-tbody');
+        try {
+          const snap = await db.collection('announcements').orderBy('createdAt', 'desc').get();
+          allAnnouncements = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+          if (allAnnouncements.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4">${emptyState('📢', 'No announcements posted')}</td></tr>`;
+            return;
+          }
+
+          let html = '';
+          allAnnouncements.forEach(a => {
+            let audBadge = '';
+            if(a.audience === 'all') audBadge = '<span class="badge bg-primary">All</span>';
+            else if(a.audience === 'public') audBadge = '<span class="badge bg-secondary">Public</span>';
+            else if(a.audience === 'students') audBadge = '<span class="badge bg-info">Students</span>';
+            else if(a.audience === 'teachers') audBadge = '<span class="badge bg-warning text-dark">Teachers</span>';
+
+            html += `
+              <tr>
+                <td>
+                  <div class="fw-bold">${escapeHTML(a.title)}</div>
+                  <div class="text-muted fs-sm text-truncate" style="max-width:300px">${escapeHTML(a.body)}</div>
+                </td>
+                <td class="align-middle">${audBadge}</td>
+                <td class="align-middle text-muted fs-sm">${formatDateShort(a.createdAt)}</td>
+                <td class="align-middle">
+                  <button class="btn btn-sm btn-outline-primary me-1" onclick="prepareModal('edit', '${a.id}')">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" onclick="deleteAnnouncement('${a.id}')">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            `;
+          });
+          tbody.innerHTML = html;
+        } catch (err) {
+          console.error(err);
+          tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Failed to load announcements.</td></tr>`;
+        }
+      }
+
+      window.prepareModal = (mode, id = null) => {
+        const form = document.getElementById('annForm');
+        const titleEl = document.getElementById('modal-title');
+        const btn = document.getElementById('btn-save-ann');
+        
+        form.reset();
+        document.getElementById('ann-id').value = '';
+
+        if (mode === 'add') {
+          titleEl.textContent = 'Post Announcement';
+          btn.textContent = 'Post Announcement';
+        } else if (mode === 'edit') {
+          titleEl.textContent = 'Edit Announcement';
+          btn.textContent = 'Save Changes';
+          const ann = allAnnouncements.find(a => a.id === id);
+          if (ann) {
+            document.getElementById('ann-id').value = ann.id;
+            document.getElementById('ann-title').value = ann.title;
+            document.getElementById('ann-audience').value = ann.audience;
+            document.getElementById('ann-body').value = ann.body;
+          }
+        }
+      };
+
+      document.getElementById('annForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-save-ann');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="spinner-border spinner-border-sm"></i> Saving...';
+
+        const id = document.getElementById('ann-id').value;
+        const data = {
+          title: document.getElementById('ann-title').value.trim(),
+          audience: document.getElementById('ann-audience').value,
+          body: document.getElementById('ann-body').value.trim(),
+          authorId: currentUser.uid
+        };
+
+        try {
+          if (id) {
+            // Update
+            await db.collection('announcements').doc(id).update({
+              ...data,
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showToast('Announcement updated', 'success');
+          } else {
+            // Add
+            await db.collection('announcements').add({
+              ...data,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showToast('Announcement posted', 'success');
+          }
+          
+          const modal = bootstrap.Modal.getInstance(document.getElementById('announcementModal'));
+          modal.hide();
+          loadAnnouncements();
+        } catch (err) {
+          console.error(err);
+          showToast('Failed to save announcement', 'error');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = id ? 'Save Changes' : 'Post Announcement';
+        }
+      });
+
+      window.deleteAnnouncement = async (id) => {
+        if (!confirmAction('Are you sure you want to delete this announcement?')) return;
+        try {
+          await db.collection('announcements').doc(id).delete();
+          showToast('Announcement deleted', 'success');
+          loadAnnouncements();
+        } catch (err) {
+          console.error(err);
+          showToast('Failed to delete announcement', 'error');
+        }
+      };
+
+    });
+  </script>
+</body>
+</html>

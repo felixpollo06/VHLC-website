@@ -1,0 +1,128 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper Functions ──────────────────────────────────────
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && getUserData().role == 'admin' && getUserData().isActive == true;
+    }
+
+    function isTeacher() {
+      return isAuthenticated() && getUserData().role == 'teacher' && getUserData().isActive == true;
+    }
+
+    function isStudent() {
+      return isAuthenticated() && getUserData().role == 'student' && getUserData().isActive == true;
+    }
+
+    function isAdminOrTeacher() {
+      return isAdmin() || isTeacher();
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    // ── Users Collection ──────────────────────────────────────
+    // Only admin can create or modify user role documents.
+    // Users can read their own document (for role lookup on login).
+    match /users/{uid} {
+      allow read:   if isOwner(uid) || isAdmin();
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── Students Collection ───────────────────────────────────
+    // Students can read only their own profile.
+    // Teachers can read all student profiles in their class.
+    // Only admin can create, update, or delete student records.
+    match /students/{studentId} {
+      allow read:   if isOwner(studentId) || isAdminOrTeacher();
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── Teachers Collection ───────────────────────────────────
+    // Teachers can read their own profile.
+    // Admin has full access.
+    match /teachers/{teacherId} {
+      allow read:   if isOwner(teacherId) || isAdmin();
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── Subjects Collection ───────────────────────────────────
+    // All authenticated users can read subjects.
+    // Only admin can write.
+    match /subjects/{subjectId} {
+      allow read:   if isAuthenticated();
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── Sections Collection ───────────────────────────────────
+    match /sections/{sectionId} {
+      allow read:   if isAuthenticated();
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── Grades Collection ─────────────────────────────────────
+    // Students can read only their own grade records.
+    // Teachers can read and write grade records.
+    // Admin has full access.
+    match /grades/{gradeId} {
+      allow read:   if isAdmin() || isTeacher() ||
+                      (isStudent() && resource.data.studentId == request.auth.uid);
+      allow create: if isAdminOrTeacher();
+      allow update: if isAdminOrTeacher();
+      allow delete: if isAdmin();
+    }
+
+    // ── Attendance Collection ─────────────────────────────────
+    // Same rules as grades.
+    match /attendance/{recordId} {
+      allow read:   if isAdmin() || isTeacher() ||
+                      (isStudent() && resource.data.studentId == request.auth.uid);
+      allow create: if isAdminOrTeacher();
+      allow update: if isAdminOrTeacher();
+      allow delete: if isAdmin();
+    }
+
+    // ── Announcements Collection ──────────────────────────────
+    // Public announcements (audience: 'public') are readable without auth.
+    // All authenticated users can read all announcements.
+    // Teachers and admins can create/update announcements.
+    // Only admin can delete.
+    match /announcements/{announcementId} {
+      allow read:   if resource.data.audience == 'public' || isAuthenticated();
+      allow create: if isAdminOrTeacher();
+      allow update: if isAdminOrTeacher() && resource.data.postedBy == request.auth.uid || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── Contact Messages Collection ───────────────────────────
+    // Anyone can create (send a contact form).
+    // Only admin can read.
+    match /contact_messages/{msgId} {
+      allow create: if true; // public form
+      allow read:   if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+  }
+}

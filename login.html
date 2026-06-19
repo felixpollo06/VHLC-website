@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | VHLC Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-logo">V</div>
+      <h2 class="login-title">VHLC Portal</h2>
+      <p class="login-subtitle">Sign in to access your dashboard</p>
+
+      <div id="error-alert" class="alert-vhlc alert-error d-none">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span id="error-msg"></span>
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="vhlc-label" for="email">Email Address</label>
+          <input type="email" id="email" class="vhlc-form-control" placeholder="you@example.com" required>
+        </div>
+        <div class="form-group">
+          <label class="vhlc-label" for="password">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="password" class="vhlc-form-control" placeholder="••••••••" required>
+            <button type="button" class="password-toggle" id="togglePassword">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn-login" id="loginBtn">Sign In</button>
+      </form>
+
+      <div class="text-center mt-4 pt-3 border-top">
+        <a href="index.html" class="text-muted text-decoration-none" style="font-size: .85rem;">
+          <i class="bi bi-arrow-left me-1"></i> Back to Website
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Redirect if already logged in
+      redirectIfLoggedIn();
+
+      const loginForm = document.getElementById('loginForm');
+      const emailInput = document.getElementById('email');
+      const passInput = document.getElementById('password');
+      const loginBtn = document.getElementById('loginBtn');
+      const errorAlert = document.getElementById('error-alert');
+      const errorMsg = document.getElementById('error-msg');
+      const togglePassword = document.getElementById('togglePassword');
+
+      // Password visibility toggle
+      togglePassword.addEventListener('click', () => {
+        const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passInput.setAttribute('type', type);
+        togglePassword.innerHTML = type === 'password' ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
+      });
+
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = emailInput.value.trim();
+        const pass = passInput.value;
+        
+        if (!email || !pass) return;
+
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Signing in...';
+        errorAlert.classList.add('d-none');
+
+        try {
+          const user = await loginUser(email, pass);
+          const role = await getUserRole(user.uid);
+          // Wait briefly for smooth transition, then redirect
+          setTimeout(() => redirectByRole(role), 500);
+        } catch (err) {
+          console.error(err);
+          let friendlyMsg = 'Invalid email or password.';
+          if (err.message.includes('disabled')) friendlyMsg = err.message;
+          if (err.code === 'auth/user-not-found') friendlyMsg = 'User not found.';
+          if (err.code === 'auth/wrong-password') friendlyMsg = 'Incorrect password.';
+          if (err.code === 'auth/too-many-requests') friendlyMsg = 'Too many attempts. Try again later.';
+          
+          errorMsg.textContent = friendlyMsg;
+          errorAlert.classList.remove('d-none');
+          
+          loginBtn.disabled = false;
+          loginBtn.innerHTML = 'Sign In';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
