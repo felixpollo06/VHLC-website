@@ -9,12 +9,13 @@
 // ============================================================
 
 const firebaseConfig = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId:             "YOUR_APP_ID"
+  apiKey: "AIzaSyCp-Qzi3PQ2hGouVqvxOk73Pu4lqq92KYU",
+  authDomain: "vhlc-portal.firebaseapp.com",
+  projectId: "vhlc-portal",
+  storageBucket: "vhlc-portal.firebasestorage.app",
+  messagingSenderId: "760963181770",
+  appId: "1:760963181770:web:9669a354528566b4d55833",
+  measurementId: "G-6JCH2WHV45"
 };
 
 // Initialize Firebase
