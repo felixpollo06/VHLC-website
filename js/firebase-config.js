@@ -22,12 +22,12 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 // ── Service References ──
-const auth      = firebase.auth();
-const db        = firebase.firestore();
-const storage   = firebase.storage();
+const auth      = typeof firebase.auth === 'function' ? firebase.auth() : null;
+const db        = typeof firebase.firestore === 'function' ? firebase.firestore() : null;
+const storage   = typeof firebase.storage === 'function' ? firebase.storage() : null;
 
 // ── Firestore Settings ──
-db.settings({ experimentalForceLongPolling: false });
+if (db) db.settings({ experimentalForceLongPolling: false });
 
 // ── Auth Persistence (session across tabs) ──
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+if (auth) auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
