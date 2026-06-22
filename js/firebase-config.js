@@ -27,7 +27,7 @@ const db        = typeof firebase.firestore === 'function' ? firebase.firestore(
 const storage   = typeof firebase.storage === 'function' ? firebase.storage() : null;
 
 // ── Firestore Settings ──
-if (db) db.settings({ experimentalForceLongPolling: false, merge: true });
+// Removed experimental settings to prevent connection hangs
 
 // ── Auth Persistence (session across tabs) ──
 if (auth) auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
