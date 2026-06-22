@@ -157,24 +157,22 @@
       try {
         await requireAuth('admin');
 
-        // Fetch counts (Note: in production, use Firestore aggregation queries if available, 
-        // or maintain counter documents. For this scale, reading size is okay).
-        
-        db.collection('students').get().then(snap => {
-          document.getElementById('stat-students').textContent = snap.size;
-        });
+        // Fetch counts with error handling
+        db.collection('students').get()
+          .then(snap => { document.getElementById('stat-students').textContent = snap.size; })
+          .catch(err => { console.warn('Failed to read students:', err.message); document.getElementById('stat-students').textContent = 'Error'; });
 
-        db.collection('teachers').get().then(snap => {
-          document.getElementById('stat-teachers').textContent = snap.size;
-        });
+        db.collection('teachers').get()
+          .then(snap => { document.getElementById('stat-teachers').textContent = snap.size; })
+          .catch(err => { console.warn('Failed to read teachers:', err.message); document.getElementById('stat-teachers').textContent = 'Error'; });
 
-        db.collection('subjects').get().then(snap => {
-          document.getElementById('stat-subjects').textContent = snap.size;
-        });
+        db.collection('subjects').get()
+          .then(snap => { document.getElementById('stat-subjects').textContent = snap.size; })
+          .catch(err => { console.warn('Failed to read subjects:', err.message); document.getElementById('stat-subjects').textContent = 'Error'; });
 
-        db.collection('announcements').get().then(snap => {
-          document.getElementById('stat-announcements').textContent = snap.size;
-        });
+        db.collection('announcements').get()
+          .then(snap => { document.getElementById('stat-announcements').textContent = snap.size; })
+          .catch(err => { console.warn('Failed to read announcements:', err.message); document.getElementById('stat-announcements').textContent = 'Error'; });
 
         // Recent Activity (Users)
         const activityContainer = document.getElementById('recent-activity');
